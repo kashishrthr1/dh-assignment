@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build outputs
+dist/
+client/dist/
+server/dist/
+.next/
+out/
+build/
+
+# Testing
+coverage/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+client/.env
+server/.env
+!.env.example
+!client/.env.example
+!server/.env.example
+
+# Logs & OS
+*.log
+npm-debug.log*
+yarn-debug.log*
+.DS_Store
+Thumbs.db
