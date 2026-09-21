@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import multer from "multer";
+import { Request } from "express";
+import multer, { FileFilterCallback } from "multer";
 import path from "path";
 import fs from "fs";
 
@@ -32,10 +33,18 @@ if (isCloudinaryConfigured) {
   }
 
   storage = multer.diskStorage({
-    destination: (_req, _file, cb) => {
+    destination: (
+      _req: Request,
+      _file: Express.Multer.File,
+      cb: (error: Error | null, destination: string) => void
+    ) => {
       cb(null, uploadsDir);
     },
-    filename: (_req, file, cb) => {
+    filename: (
+      _req: Request,
+      file: Express.Multer.File,
+      cb: (error: Error | null, filename: string) => void
+    ) => {
       const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
       cb(null, `${uniqueSuffix}-${file.originalname}`);
     },
@@ -45,7 +54,11 @@ if (isCloudinaryConfigured) {
 export const uploadProof = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
-  fileFilter: (_req, file, cb) => {
+  fileFilter: (
+    _req: Request,
+    file: Express.Multer.File,
+    cb: FileFilterCallback
+  ) => {
     const allowed = /jpeg|jpg|png|webp|pdf/;
     const ext = allowed.test(path.extname(file.originalname).toLowerCase());
     const mime = allowed.test(file.mimetype);

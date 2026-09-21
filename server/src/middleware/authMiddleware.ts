@@ -7,7 +7,10 @@ export interface AuthRequest extends Request {
     _id: string;
     role: "subscriber" | "admin";
     email: string;
-  };
+    [key: string]: any;
+  } | any;
+  file?: any;
+  files?: any;
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || "super_secret_jwt_access_key_digital_heroes_2026";

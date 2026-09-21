@@ -1,20 +1,20 @@
-import { Router } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { getDraws, getDrawById, simulateDraw, publishDraw } from "../controllers/drawController";
 import { requireAuth, requireAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
 
 // Publicly viewable published draws (optional auth to attach user entry/winnings)
-router.get("/", (req, res, next) => {
+router.get("/", (req: Request, res: Response, next: NextFunction) => {
   if (req.headers.authorization) {
-    return requireAuth(req, res, next);
+    return requireAuth(req as any, res, next);
   }
   next();
 }, getDraws);
 
-router.get("/:id", (req, res, next) => {
+router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   if (req.headers.authorization) {
-    return requireAuth(req, res, next);
+    return requireAuth(req as any, res, next);
   }
   next();
 }, getDrawById);
