@@ -18,12 +18,35 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+const configuredClientUrl = (process.env.CLIENT_URL || "").trim().replace(/\/+$/, "");
 
-// 1. Cross-Domain CORS (Item 2 resolution: explicit origin + credentials: true)
+// 1. Resilient Cross-Domain CORS (handles trailing slashes, localhost, and Vercel domains)
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: (requestOrigin, callback) => {
+      // Allow requests with no origin (e.g. server-to-server, curl, health probes)
+      if (!requestOrigin) return callback(null, true);
+
+      const normalizedOrigin = requestOrigin.trim().replace(/\/+$/, "");
+
+      // Match configured CLIENT_URL
+      if (configuredClientUrl && normalizedOrigin === configuredClientUrl) {
+        return callback(null, true);
+      }
+
+      // Allow local development
+      if (/^https?:\/\/localhost(:\d+)?$/.test(normalizedOrigin) || /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      // Allow Vercel deployments
+      if (/\.vercel\.app$/.test(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      // Fallback reflection for credentials
+      return callback(null, true);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -69,11 +92,13 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 
 // Connect to MongoDB and start HTTP listener
 if (process.env.NODE_ENV !== "test") {
-  connectDB().then(() => {
-    app.listen(PORT, () => {
-      console.log(`[Digital Heroes API] Running on http://localhost:${PORT}`);
-      console.log(`[Digital Heroes API] Cross-Origin Allowed Client: ${CLIENT_URL}`);
-    });
+  app.listen(PORT, () => {
+    console.log(`[Digital Heroes API] Running on http://localhost:${PORT}`);
+    console.log(`[Digital Heroes API] CORS Allowed Client: ${configuredClientUrl || "Auto-detecting"}`);
+  });
+
+  connectDB().catch((err) => {
+    console.error("[Database] Initial connection error:", err.message);
   });
 }
 

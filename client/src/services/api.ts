@@ -8,8 +8,17 @@ export const setAccessToken = (token: string | null) => {
 
 export const getAccessToken = () => accessToken;
 
+function resolveBaseUrl(): string {
+  let url = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").trim();
+  url = url.replace(/\/+$/, "");
+  if (!url.endsWith("/api")) {
+    url = `${url}/api`;
+  }
+  return url;
+}
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL: resolveBaseUrl(),
   withCredentials: true, // Cross-domain cookie passing for sameSite: 'none'
   headers: {
     "Content-Type": "application/json",

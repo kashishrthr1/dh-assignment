@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Digital Heroes REST API backend with Express, MongoDB, and Stripe",
   "main": "dist/server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
@@ -28,11 +31,11 @@
     "mongoose": "^8.10.1",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
-    "stripe": "^17.6.0"
+    "stripe": "^17.6.0",
+    "typescript": "^5.7.3"
   },
   "devDependencies": {
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3",
     "vitest": "^3.0.6"
   }
 }
